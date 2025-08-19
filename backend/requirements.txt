@@ -1,0 +1,9 @@
+fastapi==0.112.2
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+passlib[bcrypt]==1.7.4
+pyjwt==2.9.0
+sqlmodel==0.0.22
+pydantic==2.7.4
+pydantic-settings==2.3.4
+pydantic[email]
