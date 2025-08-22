@@ -14,6 +14,7 @@ export default function App(){
             <Link to="/campaigns">案件市集</Link>
             <Link to="/offers">我的提案</Link>
             <Link to="/profile">我的帳戶</Link>
+            <Link to="/reviews">評價</Link>
           </nav>
           <div className="ml-auto flex gap-2">
             <Link to="/login" className="px-3 py-1 rounded bg-black text-white text-sm">登入</Link>

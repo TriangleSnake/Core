@@ -9,6 +9,7 @@ import CampaignList from './pages/CampaignList'
 import NewCampaign from './pages/NewCampaign'
 import Offers from './pages/Offers'
 import Profile from './pages/Profile'
+import Reviews from './pages/Reviews'
 
 const router = createBrowserRouter([
   { path: '/', element: <App/>, children: [
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       { path: 'campaigns/new', element: <NewCampaign/> },
       { path: 'offers', element: <Offers/> },
       { path: 'profile', element: <Profile/> },
+      { path: 'reviews', element: <Reviews/> },
   ]}
 ])
 
