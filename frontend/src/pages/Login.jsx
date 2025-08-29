@@ -1,11 +1,25 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import AuthForm from "../components/AuthForm"
 import Alert from "../components/Alert"
-import { login } from "../lib/api"
+import { login, getMe } from "../lib/api"
 
 export default function Login({ onLogin }) {
   const [msg, setMsg] = useState({ type: "info", text: "" })
-
+  
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getMe()
+        if (res?.id) {
+          // 已登入，直接導回首頁
+          location = "/"
+        }
+      } catch {
+        // 沒登入就繼續顯示表單
+      }
+    })()
+  }, [])
+  
   const handleLogin = async (data) => {
     setMsg({ type: "info", text: "" })
     try {

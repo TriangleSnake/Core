@@ -6,7 +6,7 @@ import Alert from "../components/Alert"
 export default function Register() {
   const [form, setForm] = useState({
     username: "",
-    fullName: "",
+    name: "",     // ✅ 統一用 name
     phone: "",
     email: "",
     password: "",
@@ -23,7 +23,7 @@ export default function Register() {
       setMsg({ type: "success", text: "註冊成功！即將導向登入頁..." })
       setTimeout(() => navigate("/login"), 1500)
     } catch (err) {
-      setMsg({ type: "error", text: "註冊失敗：Email 已被使用或格式錯誤" })
+      setMsg({ type: "error", text: "註冊失敗：Email 或 Username 已被使用 / 格式錯誤" })
     }
   }
 
@@ -53,8 +53,8 @@ export default function Register() {
         <div>
           <label className="block text-sm font-medium">姓名</label>
           <input
-            value={form.fullName}
-            onChange={(e) => setField("fullName", e.target.value)}
+            value={form.name}   // ✅ 用 form.name
+            onChange={(e) => setField("name", e.target.value)}  // ✅ 修正這裡
             className="w-full border rounded-xl px-3 py-2 mt-1"
             placeholder="王大明"
             required

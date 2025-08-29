@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { register } from "../lib/api"
 import Alert from "../components/Alert"
 
 export default function NewOrg({ user }) {
   const [tab, setTab] = useState("select") // select | create
   const [orgs, setOrgs] = useState([])
-  const [form, setForm] = useState({ type: "club", name: "", info: "", school: "", businessNo: "" })
-  const [msg, setMsg] = useState({ type: "info", text: "" })   // ✅ Alert 狀態
+  const [form, setForm] = useState({ type: "club", username: "", name: "", info: "", school: "", businessNo: "" })
+  const [msg, setMsg] = useState({ type: "info", text: "" })
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -22,11 +23,17 @@ export default function NewOrg({ user }) {
         ]
         setOrgs(merged)
       })
-  }, [user,Navigate])
+  }, [user, navigate])
 
-  const joinOrg = async (orgId, orgType) => {
+  const typeMap = {
+    club: "clubs",
+    company: "companies"
+  }
+
+  const joinOrg = async (orgUsername, orgType) => {
     try {
-      const res = await fetch(`/api/${orgType}/${orgId}/join`, {
+      const apiType = typeMap[orgType] || orgType
+      const res = await fetch(`/api/${apiType}/${orgUsername}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",   // ✅ 帶 cookie
@@ -40,7 +47,14 @@ export default function NewOrg({ user }) {
       }
 
       setMsg({ type: "success", text: "加入成功！即將導向首頁..." })
-      setTimeout(() => navigate("/"), 1500)
+      
+      window.dispatchEvent(new Event("refresh-orgs"))
+      // ✅ 改成用 username 導向公開頁
+      setTimeout(() => {
+        if (orgType === "club") navigate(`/club/${orgUsername}`)
+        else navigate(`/company/${orgUsername}`)
+      }, 1500)
+
     } catch (err) {
       setMsg({ type: "error", text: "加入失敗：伺服器錯誤 " + err.message })
     }
@@ -63,8 +77,12 @@ export default function NewOrg({ user }) {
         return
       }
 
-      setMsg({ type: "success", text: "建立成功！即將導向首頁..." })
-      setTimeout(() => navigate("/"), 1500)
+      setMsg({ type: "success", text: "建立成功！即將導向..." })
+      window.dispatchEvent(new Event("refresh-orgs"))
+      setTimeout(() => {
+        if (form.type === "club") navigate(`/club/${form.username}`)
+        else navigate(`/company/${form.username}`)
+      }, 1500)
     } catch (err) {
       setMsg({ type: "error", text: "建立失敗：伺服器錯誤 " + err.message })
     }
@@ -81,7 +99,6 @@ export default function NewOrg({ user }) {
         </button>
       </div>
 
-      {/* ✅ Alert */}
       {msg.text && (
         <Alert
           type={msg.type}
@@ -93,12 +110,12 @@ export default function NewOrg({ user }) {
       {tab==="select" ? (
         <div className="grid gap-3">
           {orgs.map(o => (
-            <div key={o.id} className="p-3 border rounded-lg flex justify-between items-center">
+            <div key={o.username} className="p-3 border rounded-lg flex justify-between items-center">
               <div>
                 <div className="font-medium">{o.name}</div>
                 <div className="text-xs text-gray-500">{o.type==="club"?"社團":"廠商"}</div>
               </div>
-              <button onClick={()=>joinOrg(o.id, o.type)} className="px-3 py-1.5 rounded bg-black text-white text-sm">
+              <button onClick={()=>joinOrg(o.username, o.type)} className="px-3 py-1.5 rounded bg-black text-white text-sm">
                 加入
               </button>
             </div>
@@ -113,8 +130,13 @@ export default function NewOrg({ user }) {
               className={`px-3 py-1.5 rounded-lg ${form.type==="company"?"bg-black text-white":"border"}`}>廠商</button>
           </div>
 
-          <input placeholder="名稱" value={form.name} onChange={e=>setForm({...form, name:e.target.value})}
-            className="w-full border rounded px-3 py-2"/>
+          {/* username */}
+          <input placeholder="識別用名稱（僅英文/數字/連字號）" value={form.username} onChange={e=>setForm({...form, username:e.target.value})}
+            className="w-full border rounded px-3 py-2" required />
+
+          {/* display name */}
+          <input placeholder="顯示名稱" value={form.name} onChange={e=>setForm({...form, name:e.target.value})}
+            className="w-full border rounded px-3 py-2" required />
 
           {form.type==="club" && (
             <input placeholder="學校" value={form.school} onChange={e=>setForm({...form, school:e.target.value})}
